@@ -10,7 +10,9 @@ import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -49,11 +51,22 @@ public class MainActivity extends AppCompatActivity {
         compositeDisposable.add(myObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                        .map(student -> {
+                       /* .map(student -> {
 
                             student.setName(student.getName().toUpperCase(Locale.ROOT));
 
                             return student;
+                        })*/
+                        .flatMap((Function<Student, ObservableSource<Student>>) student -> {
+
+                            Student student1 = new Student();
+                            student1.setName(student.getName());
+
+                            Student student2 = new Student();
+                            student2.setName(student.getName());
+
+                            student.setName(student.getName().toUpperCase(Locale.ROOT));
+                            return Observable.just(student,student1,student2);
                         })
                 .subscribeWith(getObserver())
         );
@@ -65,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         myObserver = new DisposableObserver<Student>() {
             @Override
             public void onNext(Student s) {
-
 
                 Log.i(TAG, " onNext invoked with " + s.getName());
             }
