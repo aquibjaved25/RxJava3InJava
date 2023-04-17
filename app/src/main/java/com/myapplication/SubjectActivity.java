@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.AsyncSubject;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class SubjectActivity extends AppCompatActivity {
 
@@ -22,8 +23,57 @@ public class SubjectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
 
-        asyncSubjectDemo1();
+        //asyncSubjectDemo1();
+        //asyncSubjectDemo2();
+        behaviourSubjectDemo2();
+    }
 
+    void behaviourSubjectDemo1(){
+        Observable<String> observable = Observable.just("Java","Kotlin","Xml","JSON")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        BehaviorSubject<String> behaviorSubject = BehaviorSubject.create();
+        observable.subscribe(behaviorSubject);
+
+        behaviorSubject.subscribe(getFirstObserver());
+        behaviorSubject.subscribe(getSecondObserver());
+        behaviorSubject.subscribe(getThirdObserver());
+    }
+
+    void behaviourSubjectDemo2(){
+
+        BehaviorSubject<String> behaviorSubject = BehaviorSubject.create();
+
+        behaviorSubject.subscribe(getFirstObserver());
+
+        behaviorSubject.onNext("JAVA");
+        behaviorSubject.onNext("KOTLIN");
+        behaviorSubject.onNext("XML");
+
+        behaviorSubject.subscribe(getSecondObserver());
+
+        behaviorSubject.onNext("JSON");
+        behaviorSubject.onComplete();
+
+        behaviorSubject.subscribe(getThirdObserver());
+    }
+    void asyncSubjectDemo2(){
+
+        AsyncSubject<String> asyncSubject = AsyncSubject.create();
+
+        asyncSubject.subscribe(getFirstObserver());
+
+        asyncSubject.onNext("JAVA");
+        asyncSubject.onNext("KOTLIN");
+        asyncSubject.onNext("XML");
+
+        asyncSubject.subscribe(getSecondObserver());
+
+        asyncSubject.onNext("JSON");
+        asyncSubject.onComplete();
+
+        asyncSubject.subscribe(getThirdObserver());
     }
 
     void asyncSubjectDemo1(){
@@ -38,6 +88,8 @@ public class SubjectActivity extends AppCompatActivity {
         asyncSubject.subscribe(getSecondObserver());
         asyncSubject.subscribe(getThirdObserver());
     }
+
+
 
     private Observer<String> getFirstObserver(){
         return new Observer<String>() {
